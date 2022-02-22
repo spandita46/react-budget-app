@@ -1,5 +1,5 @@
 #Build Directories 
-public/
+dist/
 
 # Dependency directories
 node_modules/
