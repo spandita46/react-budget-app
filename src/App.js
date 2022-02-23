@@ -3,11 +3,23 @@ import { Container, Stack, Button } from "react-bootstrap";
 import BudgetCard from "./components/BudgetCard";
 import "./App.css";
 import AddBudgetModal from "./components/AddBudgetModal";
-import { useBudgets } from "./contexts/BudgetsContext";
+import { UNCATEGORISED_BUDGET_ID, useBudgets } from "./contexts/BudgetsContext";
+import AddExpenseModal from "./components/AddExpenseModal";
+import UncategorizedBudgetCard from "./components/UncategorizedBudgetCard";
+import TotalBudgetCard from "./components/TotalBudgetCard";
+import ViewExpensesModal from "./components/ViewExpensesModal";
 
 const App = () => {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
+  const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
+  const [addExpenseModalBudgetId, setAddExpenseModalBudgetId] = useState();
+  const [viewExpenseModalBudgetId, setViewExpenseModalBudgetId] = useState();
   const { budgets, getBudgetExpenses } = useBudgets();
+
+  function openAddExpenseModal(budgetId) {
+    setShowAddExpenseModal(true);
+    setAddExpenseModalBudgetId(budgetId);
+  }
 
   return (
     <React.Fragment>
@@ -22,7 +34,9 @@ const App = () => {
           >
             Add Budget
           </Button>
-          <Button variant="outline-primary">Add Expense</Button>
+          <Button variant="outline-primary" onClick={openAddExpenseModal}>
+            Add Expense
+          </Button>
         </Stack>
 
         <div
@@ -45,15 +59,39 @@ const App = () => {
                 name={budget.name}
                 amount={amount}
                 max={budget.max}
+                onAddExpenseClick={() => openAddExpenseModal(budget.id)}
+                onViewExpenseClick={() =>
+                  setViewExpenseModalBudgetId(budget.id)
+                }
               />
             );
           })}
+          <UncategorizedBudgetCard
+            onAddExpenseClick={() => openAddExpenseModal()}
+            onViewExpenseClick={() =>
+              setViewExpenseModalBudgetId(UNCATEGORISED_BUDGET_ID)
+            }
+          />
+          <TotalBudgetCard />
         </div>
       </Container>
       <AddBudgetModal
         show={showAddBudgetModal}
         handleClose={() => {
           setShowAddBudgetModal(false);
+        }}
+      />
+      <AddExpenseModal
+        show={showAddExpenseModal}
+        handleClose={() => {
+          setShowAddExpenseModal(false);
+        }}
+        defaultBudgetId={addExpenseModalBudgetId}
+      />
+      <ViewExpensesModal
+        budgetId={viewExpenseModalBudgetId}
+        handleClose={() => {
+          setViewExpenseModalBudgetId();
         }}
       />
     </React.Fragment>
